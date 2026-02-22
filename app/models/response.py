@@ -3,7 +3,16 @@ from typing import Any
 from pydantic import BaseModel
 
 
+class RetailerDetail(BaseModel):
+    price_cad: float
+    in_stock: bool
+    platform_rating: float
+    review_count: int
+    shipping: str
+
+
 class PricingAnalysis(BaseModel):
+    retailers: dict[str, RetailerDetail]
     prices_by_retailer: dict[str, float]
     average_price: float
     price_range: dict[str, float]

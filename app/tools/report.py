@@ -50,6 +50,7 @@ Respond with ONLY valid JSON in this exact format, no markdown, no explanation:
 {{
     "executive_summary": "<2-3 sentence strategic summary of the product position in the Canadian market>",
     "pricing_analysis": {{
+        "retailers": {json.dumps(scraper_data["retailers"])},
         "prices_by_retailer": {json.dumps(scraper_data["prices_by_retailer"])},
         "average_price": {scraper_data["average_price"]},
         "price_range": {{"min": <float>, "max": <float>}},
@@ -79,4 +80,9 @@ Respond with ONLY valid JSON in this exact format, no markdown, no explanation:
     )
 
     raw = message.content[0].text.strip()
-    return json.loads(raw)
+    # Strip markdown code blocks if the LLM wraps its response in ```json ... ```
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+    return json.loads(raw.strip())

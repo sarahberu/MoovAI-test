@@ -9,9 +9,14 @@ client = TestClient(app)
 MOCK_REPORT = {
     "executive_summary": "The Oura Ring Gen 3 holds a strong premium position in the Canadian market.",
     "pricing_analysis": {
-        "prices_by_retailer": {"Amazon.ca": 449.99, "BestBuy.ca": 459.99},
-        "average_price": 454.99,
-        "price_range": {"min": 449.99, "max": 459.99},
+        "retailers": {
+            "Amazon.ca":      {"price_cad": 449.99, "in_stock": True, "platform_rating": 4.3, "review_count": 1842, "shipping": "Free with Prime"},
+            "BestBuy.ca":     {"price_cad": 459.99, "in_stock": True, "platform_rating": 4.1, "review_count": 523,  "shipping": "Free shipping over $35"},
+            "Official Store": {"price_cad": 429.99, "in_stock": True, "platform_rating": 4.5, "review_count": 980,  "shipping": "Free standard shipping"},
+        },
+        "prices_by_retailer": {"Amazon.ca": 449.99, "BestBuy.ca": 459.99, "Official Store": 429.99},
+        "average_price": 446.66,
+        "price_range": {"min": 429.99, "max": 459.99},
         "price_positioning": "Premium pricing consistent with brand positioning.",
     },
     "competitive_landscape": {
