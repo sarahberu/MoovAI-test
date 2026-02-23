@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from typing import Any
 
 import anthropic
@@ -39,17 +40,18 @@ Respond with ONLY valid JSON in this exact format, no markdown, no explanation:
 }}"""
 
     client = _get_client()
-    message = client.messages.create(
-        model=os.environ.get("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001"),
-        max_tokens=1024,
-        temperature=0.1,
-        messages=[{"role": "user", "content": prompt}],
-    )
+    try:
+        message = client.messages.create(
+            model=os.environ.get("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001"),
+            max_tokens=1024,
+            temperature=0.1,
+            messages=[{"role": "user", "content": prompt}],
+        )
+    except anthropic.APIError as e:
+        raise RuntimeError(f"Anthropic API error during sentiment analysis: {e}") from e
 
-    raw = message.content[0].text.strip()
-    # Strip markdown code blocks if the LLM wraps its response in ```json ... ```
-    if raw.startswith("```"):
-        raw = raw.split("```")[1]
-        if raw.startswith("json"):
-            raw = raw[4:]
-    return json.loads(raw.strip())
+    raw = message.content[0].text
+    match = re.search(r'\{.*\}', raw, re.DOTALL)
+    if not match:
+        raise ValueError(f"No JSON object found in LLM response: {raw!r}")
+    return json.loads(match.group())

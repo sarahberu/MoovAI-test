@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 @router.post("/analyze", response_model=AnalyzeResponse)
 def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
     """
-    Trigger a full market analysis for a product in the Canadian market.
+    Trigger a full market analysis for a product in a given market.
 
     Orchestrates three tools in sequence:
     1. Web Scraper (mocked) — pricing, competitors, reviews
