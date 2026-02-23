@@ -34,7 +34,7 @@ def orchestrate(product_name: str, market: str) -> dict[str, Any]:
 
     # Step 2: Analyze sentiment from collected reviews
     logger.info("Step 2/3: Running sentiment analysis")
-    sentiment_data = run_sentiment_analysis(product_name, scraper_data["review_samples"])
+    sentiment_data = run_sentiment_analysis(product_name, market, scraper_data["review_samples"])
     logger.info(
         "Sentiment complete. Overall: %s (score: %.2f)",
         sentiment_data["overall_sentiment"],

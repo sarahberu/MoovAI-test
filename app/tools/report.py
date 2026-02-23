@@ -28,14 +28,18 @@ def run_report_generator(
     competitive landscape, and sentiment insights into a structured
     strategic business report in JSON format.
     """
-    prompt = f"""You are a Market Intelligence Analyst specializing in the Canadian consumer electronics market.
+    system_prompt = (
+        f"You are a Market Intelligence Analyst specializing in the {market} market. "
+        "Base your analysis strictly on the data provided. "
+        "Do not invent prices, competitors, or market information not present in the input."
+    )
 
-Generate a comprehensive market intelligence report based on the following data.
+    user_prompt = f"""Generate a comprehensive market intelligence report based on the following data.
 
 Product: {product_name}
 Market: {market}
 
-Pricing Data (CAD):
+Pricing Data:
 {json.dumps({"prices_by_retailer": scraper_data["prices_by_retailer"], "average_price": scraper_data["average_price"]}, indent=2)}
 
 Competitor Landscape:
@@ -49,17 +53,17 @@ Sentiment Analysis Results:
 
 Respond with ONLY valid JSON in this exact format, no markdown, no explanation:
 {{
-    "executive_summary": "<2-3 sentence strategic summary of the product position in the Canadian market>",
+    "executive_summary": "<2-3 sentence strategic summary of the product position in the {market} market>",
     "pricing_analysis": {{
         "retailers": {json.dumps(scraper_data["retailers"])},
         "prices_by_retailer": {json.dumps(scraper_data["prices_by_retailer"])},
         "average_price": {scraper_data["average_price"]},
         "price_range": {{"min": <float>, "max": <float>}},
-        "price_positioning": "<narrative about how the product is priced relative to competitors in Canada>"
+        "price_positioning": "<narrative about how the product is priced relative to competitors in {market}>"
     }},
     "competitive_landscape": {{
         "main_competitors": {json.dumps(scraper_data["competitors"])},
-        "market_position": "<description of where the product sits in the Canadian competitive landscape>",
+        "market_position": "<description of where the product sits in the {market} competitive landscape>",
         "competitive_advantages": ["advantage1", "advantage2", "advantage3"]
     }},
     "sentiment_analysis": {{
@@ -78,7 +82,8 @@ Respond with ONLY valid JSON in this exact format, no markdown, no explanation:
             model=os.environ.get("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001"),
             max_tokens=2048,
             temperature=0.2,
-            messages=[{"role": "user", "content": prompt}],
+            system=system_prompt,
+            messages=[{"role": "user", "content": user_prompt}],
         )
     except anthropic.APIError as e:
         raise RuntimeError(f"Anthropic API error during report generation: {e}") from e

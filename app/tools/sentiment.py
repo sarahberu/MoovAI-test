@@ -15,7 +15,7 @@ def _get_client() -> anthropic.Anthropic:
     return _client
 
 
-def run_sentiment_analysis(product_name: str, review_samples: list[str]) -> dict[str, Any]:
+def run_sentiment_analysis(product_name: str, market: str, review_samples: list[str]) -> dict[str, Any]:
     """
     LLM-based sentiment analyzer tool.
 
@@ -25,7 +25,13 @@ def run_sentiment_analysis(product_name: str, review_samples: list[str]) -> dict
     """
     reviews_text = "\n".join(f"- {review}" for review in review_samples)
 
-    prompt = f"""You are a sentiment analysis expert. Analyze the following customer reviews for {product_name} in the Canadian market.
+    system_prompt = (
+        "You are a sentiment analysis expert. "
+        "Base your analysis strictly on the reviews provided. "
+        "Do not invent data or make assumptions beyond what is explicitly stated in the reviews."
+    )
+
+    user_prompt = f"""Analyze the following customer reviews for {product_name} in the {market} market.
 
 Reviews:
 {reviews_text}
@@ -45,7 +51,8 @@ Respond with ONLY valid JSON in this exact format, no markdown, no explanation:
             model=os.environ.get("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001"),
             max_tokens=1024,
             temperature=0.1,
-            messages=[{"role": "user", "content": prompt}],
+            system=system_prompt,
+            messages=[{"role": "user", "content": user_prompt}],
         )
     except anthropic.APIError as e:
         raise RuntimeError(f"Anthropic API error during sentiment analysis: {e}") from e

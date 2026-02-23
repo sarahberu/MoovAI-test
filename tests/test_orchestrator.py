@@ -73,7 +73,7 @@ def test_orchestrate_passes_reviews_to_sentiment():
         orchestrate("Oura Ring Gen 3", "Canada")
 
         args, _ = mock_sentiment.call_args
-        assert args[1] == MOCK_SCRAPER["review_samples"]
+        assert args[2] == MOCK_SCRAPER["review_samples"]
 
 
 def test_orchestrate_passes_sentiment_to_report():

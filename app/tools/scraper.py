@@ -51,7 +51,7 @@ def run_scraper(product_name: str, market: str) -> dict[str, Any]:
     """
     Mocked web scraper tool.
 
-    Simulates data collection from Canadian e-commerce platforms.
+    Simulates data collection from e-commerce platforms for the given market.
     Faker randomizes prices and review selection on each call.
     In production, replace with a real scraping service, third-party product API,
     or data provider integration — the interface stays the same.

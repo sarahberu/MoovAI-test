@@ -3,8 +3,5 @@ services:
     build: .
     ports:
       - "8000:8000"
-    environment:
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - ANTHROPIC_MODEL=${ANTHROPIC_MODEL:-claude-haiku-4-5-20251001}
     env_file:
       - .env
