@@ -26,3 +26,4 @@ htmlcov/
 
 # macOS
 .DS_Store
+*.pyc

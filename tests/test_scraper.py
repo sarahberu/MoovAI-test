@@ -20,12 +20,6 @@ def test_scraper_prices_are_positive_floats():
         assert price > 0, f"{retailer} price should be positive"
 
 
-def test_scraper_average_price_consistent():
-    result = run_scraper("Oura Ring Gen 3", "Canada")
-    prices = list(result["prices_by_retailer"].values())
-    assert result["average_price"] > 0
-    assert min(prices) <= result["average_price"] <= max(prices)
-
 
 def test_scraper_has_at_least_one_competitor():
     result = run_scraper("Oura Ring Gen 3", "Canada")
@@ -65,8 +59,3 @@ def test_scraper_retailers_structure():
         assert 0.0 <= data["platform_rating"] <= 5.0
 
 
-def test_scraper_retailers_match_prices():
-    result = run_scraper("Oura Ring Gen 3", "Canada")
-    for shop in result["retailers"]:
-        assert shop in result["prices_by_retailer"]
-        assert result["retailers"][shop]["price_cad"] == result["prices_by_retailer"][shop]

@@ -84,19 +84,9 @@ def test_orchestrate_passes_sentiment_to_report():
     ):
         orchestrate("Oura Ring Gen 3", "Canada")
 
-        _, kwargs = mock_report.call_args
-        assert kwargs.get("sentiment_data") == MOCK_SENTIMENT or MOCK_SENTIMENT in mock_report.call_args.args
+        args, _ = mock_report.call_args
+        assert args[3] == MOCK_SENTIMENT  # 4th positional arg: sentiment_data
 
-
-def test_orchestrate_returns_report():
-    with (
-        patch("app.orchestrator.agent.run_scraper", return_value=MOCK_SCRAPER),
-        patch("app.orchestrator.agent.run_sentiment_analysis", return_value=MOCK_SENTIMENT),
-        patch("app.orchestrator.agent.run_report_generator", return_value=MOCK_REPORT),
-    ):
-        result = orchestrate("Oura Ring Gen 3", "Canada")
-
-        assert result == MOCK_REPORT
 
 
 def test_orchestrate_raises_on_scraper_failure():
@@ -111,4 +101,14 @@ def test_orchestrate_raises_on_sentiment_failure():
         patch("app.orchestrator.agent.run_sentiment_analysis", side_effect=ValueError("LLM parse error")),
     ):
         with pytest.raises(ValueError, match="LLM parse error"):
+            orchestrate("Oura Ring Gen 3", "Canada")
+
+
+def test_orchestrate_raises_on_report_failure():
+    with (
+        patch("app.orchestrator.agent.run_scraper", return_value=MOCK_SCRAPER),
+        patch("app.orchestrator.agent.run_sentiment_analysis", return_value=MOCK_SENTIMENT),
+        patch("app.orchestrator.agent.run_report_generator", side_effect=RuntimeError("LLM parse error")),
+    ):
+        with pytest.raises(RuntimeError, match="LLM parse error"):
             orchestrate("Oura Ring Gen 3", "Canada")

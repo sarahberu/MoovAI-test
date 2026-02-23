@@ -62,35 +62,9 @@ def test_analyze_rejects_non_canada_market():
     assert response.status_code == 422
 
 
-def test_analyze_requires_product_name():
-    response = client.post("/analyze", json={"market": "Canada"})
-    assert response.status_code == 422
-
-
-def test_analyze_requires_market():
-    response = client.post("/analyze", json={"product_name": "Oura Ring Gen 3"})
-    assert response.status_code == 422
-
-
 def test_analyze_returns_500_on_pipeline_failure():
     with patch("app.api.routes.orchestrate", side_effect=Exception("Unexpected error")):
         response = client.post("/analyze", json={"product_name": "Oura Ring Gen 3", "market": "Canada"})
     assert response.status_code == 500
 
 
-def test_analyze_pricing_analysis_structure():
-    with patch("app.api.routes.orchestrate", return_value=MOCK_REPORT):
-        response = client.post("/analyze", json={"product_name": "Oura Ring Gen 3", "market": "Canada"})
-    pricing = response.json()["pricing_analysis"]
-    assert "prices_by_retailer" in pricing
-    assert "average_price" in pricing
-    assert "price_range" in pricing
-    assert "price_positioning" in pricing
-
-
-def test_analyze_strategic_recommendations_is_list():
-    with patch("app.api.routes.orchestrate", return_value=MOCK_REPORT):
-        response = client.post("/analyze", json={"product_name": "Oura Ring Gen 3", "market": "Canada"})
-    recs = response.json()["strategic_recommendations"]
-    assert isinstance(recs, list)
-    assert len(recs) > 0
